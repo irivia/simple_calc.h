@@ -1,6 +1,6 @@
 #include <string.h>
 #define SIMPLE_CALC_IMPLEMENTATION
-#include "../simple_calc.h"
+#include "../simple-calc.h"
 #include "stdio.h"
 #include "test_cases.h"
 #include <stdlib.h>
