@@ -21,14 +21,16 @@
     #define SC_FREE(ptr) free(ptr)
 #endif
 
-#define sc_list_append(list, item)                                                            \
-    do {                                                                                      \
-        if ((list).count >= (list).capacity) {                                                \
-            (list).capacity = (list).capacity < 64 ? 64 : (list).capacity * 2;                \
-            (list).items = SC_REALLOC((list).items, sizeof(*(list).items) * (list).capacity); \
-        }                                                                                     \
-        (list).items[(list).count] = item;                                                    \
-        (list).count += 1;                                                                    \
+#define SC_LIST_DEFAULT_CAP 64
+
+#define sc_list_append(list, item)                                                                               \
+    do {                                                                                                         \
+        if ((list).count >= (list).capacity) {                                                                   \
+            (list).capacity = (list).capacity < SC_LIST_DEFAULT_CAP ? SC_LIST_DEFAULT_CAP : (list).capacity * 2; \
+            (list).items = SC_REALLOC((list).items, sizeof(*(list).items) * (list).capacity);                    \
+        }                                                                                                        \
+        (list).items[(list).count] = item;                                                                       \
+        (list).count += 1;                                                                                       \
     } while (0)
 
 #define sc_list_delete(list)   \
