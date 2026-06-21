@@ -4,29 +4,29 @@
 #include "stdio.h"
 #include "test_cases.h"
 #include <stdlib.h>
+#include <time.h>
 
-#define EXPECTED(expr, expected)\
-    do {\
-        double eps = 1e-5;\
-        double result = sc_calculate(expr, -1);\
-        bool equal;\
-        double diff = expected - result;\
-        if (diff < 0) diff *= -1;\
-        if (diff <= eps) {\
-            success += 1;\
-            equal = true;\
-        }\
-        else {\
-            equal = false;\
-        }\
-        printf("{\n");\
-        printf("  input  : %s\n", expr);\
-        printf("  answer : %lf\n", (double)expected);\
-        printf("  output : %lf\n", result);\
-        printf("  status : %s\n", equal ? "SUCCESS" : "FAILURE");\
-        printf("}\n");\
-        if (!equal) return 0;\
-    } while (0)
+bool EXPECTED(const char *expr, double expected, int *time)
+{
+    double eps = 1e-5;
+    *time = 0;
+    int t1 = clock();
+    double result = sc_calculate(expr, -1);
+    *time = clock() - t1;
+    bool equal;
+    double diff = expected - result;
+    if (diff < 0) diff *= -1;
+    equal = diff <= eps;
+
+    printf("{\nn");
+    printf("  input  : %s\n", expr);
+    printf("  answer : %lf\n", (double)expected);
+    printf("  output : %lf\n", result);
+    printf("  status : %s\n", equal ? "SUCCESS" : "FAILURE");
+    printf("}\n");
+
+    return equal;
+}
 
 typedef struct {
     const char *input;
@@ -78,11 +78,20 @@ int main(void)
         return 1;
     }
 
+    size_t clocks = 0;
     for (size_t i = 0; i < cases.count; i++) {
-        EXPECTED(cases.items[i].input, cases.items[i].answer);
+        int clk = 0;
+        if (EXPECTED(cases.items[i].input, cases.items[i].answer, &clk)) {
+            success++;
+            clocks += clk;
+        }
     }
+    double total_time_ms = (double)clocks / (CLOCKS_PER_SEC/1000.f);
+    double average_time_ms = total_time_ms/success;
 
     printf("%zu out of %zu tests succeeded\n", success, cases.count);
+    printf("Total Time: %lfms\n", total_time_ms);
+    printf(" Mean Time: %lfms\n", average_time_ms);
 
     return 0;
 }
